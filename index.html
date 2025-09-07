@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Freelance Mini Dashboard – JSONPlaceholder</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" integrity="sha512-V8m8fQvIv7R1N8x8yUe3dQ0d4c9b1g6aS7xYxwY6wVQqYl1m7M7rWvQ0M1p2gqlQis5w6t5E8nXwZPpZr3j7xA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css" />
+  <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet" />
+<link href="assets/css/style.css" rel="stylesheet"/>
+ 
+</head>
+<body>
+
+  <div id="loader"><div class="spinner animate__animated animate__pulse"></div></div>
+
+  <header>
+    <div class="container toolbar">
+      <div style="display:flex;gap:10px;align-items:center">
+        <i class="fa-solid fa-layer-group"></i>
+        <strong>Mini Freelance Dashboard</strong>
+      </div>
+      <nav>
+        <a href="#dashboard" data-section="dashboard" class="active">Dashboard</a>
+        <a href="#users" data-section="users">Users</a>
+        <a href="#posts" data-section="posts">Posts</a>
+      </nav>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button id="toggleTheme" class="btn" title="Light/Dark">
+          <i class="fa-solid fa-sun"></i>
+          <span class="hint">Light/Dark</span>
+        </button>
+        <button id="reload" class="btn" title="Reload data"><i class="fa-solid fa-rotate"></i></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" id="app">
+ 
+    <section id="section-dashboard" class="active animate__animated animate__fadeIn">
+      <div class="row grid-3">
+        <div class="card"><h3><i class="fa-solid fa-users"></i> Users</h3><div class="muted">إجمالي المستخدمين</div><h2 id="statUsers">—</h2></div>
+        <div class="card"><h3><i class="fa-solid fa-pen-nib"></i> Posts</h3><div class="muted">إجمالي المنشورات</div><h2 id="statPosts">—</h2></div>
+        <div class="card"><h3><i class="fa-regular fa-comments"></i> Comments</h3><div class="muted">إجمالي التعليقات</div><h2 id="statComments">—</h2></div>
+      </div>
+    
+    </section>
+
+
+    <section id="section-users" class="animate__animated animate__fadeIn">
+      <div class="toolbar" style="margin:8px 0 12px">
+        <div style="display:flex;align-items:center;gap:8px"><i class="fa-solid fa-users"></i><h2 style="margin:0">Users</h2></div>
+        <div class="hint">نجمة ⭐ لإضافة للمفضلة</div>
+      </div>
+      <div class="card">
+        <table id="usersTable" class="display">
+          <thead>
+            <tr>
+              <th>⭐</th>
+              <th>الاسم</th>
+              <th>الإيميل</th>
+              <th>الشركة</th>
+              <th>إجراءات</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- POSTS -->
+    <section id="section-posts" class="animate__animated animate__fadeIn">
+      <div class="toolbar" style="margin:8px 0 12px">
+        <div style="display:flex;align-items:center;gap:8px"><i class="fa-solid fa-pen-nib"></i><h2 style="margin:0">Posts</h2></div>
+        <div style="display:flex;gap:8px">
+          <input id="postSearch" class="input" placeholder="بحث حي..." style="min-width:220px" />
+          <button id="addPost" class="btn primary"><i class="fa-solid fa-plus"></i> إضافة Post</button>
+        </div>
+      </div>
+      <div id="postsList" class="row grid-2"></div>
+      <div class="card" id="commentsCard" style="margin-top:16px; display:none">
+        <h3>التعليقات</h3>
+        <div id="comments"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">Built with jQuery · DataTables · Toastr · Animate.css · JSONPlaceholder</div>
+  </footer>
+
+  <!-- Modal (Edit User) -->
+  <div class="modal" id="userModal">
+    <div class="dialog">
+      <h3>تعديل مستخدم</h3>
+      <div style="display:grid;gap:8px">
+        <input id="um_name" class="input" placeholder="الاسم" />
+        <input id="um_email" class="input" placeholder="الإيميل" />
+        <input id="um_company" class="input" placeholder="الشركة" />
+      </div>
+      <div class="actions" style="margin-top:12px">
+        <button class="btn" id="um_cancel">إلغاء</button>
+        <button class="btn primary" id="um_save">حفظ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal (Edit Post) -->
+  <div class="modal" id="postModal">
+    <div class="dialog">
+      <h3 id="pm_title">إضافة/تعديل Post</h3>
+      <div style="display:grid;gap:8px">
+        <input id="pm_postTitle" class="input" placeholder="العنوان" />
+        <textarea id="pm_postBody" class="input" placeholder="المحتوى"></textarea>
+      </div>
+      <div class="actions" style="margin-top:12px">
+        <button class="btn" id="pm_cancel">إلغاء</button>
+        <button class="btn primary" id="pm_save">حفظ</button>
+      </div>
+    </div>
+  </div>
+ <script src="assets/js/main.js"></script>
+</body>
+</html>
